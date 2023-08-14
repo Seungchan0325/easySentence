@@ -2,7 +2,7 @@ import argparse
 import openai
 import json
 
-openai.api_key = ""
+openai.api_key = "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"
 
 def query(prompt: str) -> str:
     messages = [{"role": "user", "content": prompt}]
@@ -12,8 +12,6 @@ def query(prompt: str) -> str:
         messages=messages,
         temperature=0.7
     )
-    print(prompt)
-    print(response['choices'][0]['message']['content'])
 
     if response['choices'][0]['finish_reason'] != 'stop':
         print("Error: gpt didn't answer")
@@ -49,7 +47,6 @@ STEP 2: 나눈 문장의 단어를 쉬운 단어로 바꾸어 준다.
 #세 개의 역따옴표로 구분된 한글 문장이 주워진다.
     
     answer = query(prompt)
-    #print("Debug: ", answer)
     json_object = parse_json(answer)
     return json_object['sentences']
 
@@ -62,7 +59,6 @@ def splitText(text: str) -> list[str]:
 ```{text}```
 '''
     answer = query(prompt)
-    #print("Debug: ", answer)
     json_object = parse_json(answer)
     return json_object['sentences']
 
