@@ -10,7 +10,7 @@ def query(prompt: str) -> str:
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
-        temperature=0.7
+        temperature=1
     )
 
     if response['choices'][0]['finish_reason'] != 'stop':
