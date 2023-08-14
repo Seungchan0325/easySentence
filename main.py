@@ -2,7 +2,7 @@ import argparse
 import openai
 import json
 
-openai.api_key = "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"
+openai.api_key = ""
 
 def query(prompt: str) -> str:
     messages = [{"role": "user", "content": prompt}]
