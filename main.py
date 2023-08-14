@@ -1,78 +1,80 @@
+import argparse
 import openai
 import json
 
-openai.api_key = ""
+openai.api_key = "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"
 
-def query(question: str) -> str:
-    messages = [{"role": "user", "content": question}]
+def query(prompt: str) -> str:
+    messages = [{"role": "user", "content": prompt}]
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
         temperature=1
     )
-    print("Debug: ", response)
+
+    #print("Debug: ", response)
+
+    if response['choices'][0]['finish_reason'] != 'stop':
+        print("Error: gpt didn't answer")
+        exit(-1)
     return response['choices'][0]['message']['content']
 
 def parse_json(text: str):
-    l = text.find('{')
+    l = text.rfind('{')
     r = text.rfind('}') + 1
     text = text[l:r]
 
     return json.loads(text)
 
-def splitSentence(sentence: str) -> list[str]:
-    message = """우리의 목표는 문장을 이해하기 쉽도록 여러 완전한 문장으로 나누는 것입니다.
-문장을 나누는 방법은 하나의 문장을 같은 의미를 한 여러 개의 문장으로 나누는 것 또는 이 외에도 여러 방법으로 문장을 나눌 수 있습니다.
+def translateToEasySentence(sentence: str) -> list[str]:
+    prompt = f'''
+나는 언어장애인들이 한글 문장을 이해하기 쉽도록 한글 문장을 쉬운 문장으로 바꾸고 있다.
 
-입력은 한글로 이루어진 한국어 문장입니다.
+이를 위한 과정은
+STEP 1: 문장을 여러 개의 문장으로 나눈다. (예시: "나는 그가 떠난 것을 안다." -> "그가 떠났다.", "나는 그것을 안다.")
+STEP 2: 나눈 문장의 단어를 쉬운 단어로 바꾸어 준다.
+이다.
 
-출력은 다음과 같은 형식을 따릅니다.
-아래와 같은 JSON 형식의 sentences배열에 나누어진 문장을 추가합니다. 나누지 않았을 경우에도 sentences 배열에 추가합니다.
-{
-	"sentences": []
-}
+위의 과정의 결과를 JSON 형식으로 sentences 키를 가진 문자열 목록으로 생성하라.
 
-입력이 "%s" 일 때 JSON 파일 출력하세요.""" % sentence
+세 개의 역따옴표로 구분된 한글 문장이 주워진다.
 
-    text = query(message)
-    json_object = parse_json(text)
+```{sentence}```
+'''
+    
+    answer = query(prompt)
+    #print("Debug: ", answer)
+    json_object = parse_json(answer)
     return json_object['sentences']
 
-def easyWord(sentence: str) -> str:
-    message = """우리의 목표는 한국어 문장에 어려운 단어가 있다면 쉽고 간결한 단어로 바꾸는 것이다.
-만약 어려운 단어를 바꿀 쉬운 단어가 없다면 어려운 단어를 풀어쓰면 된다.
-어려운 단어가 없다면 아무 작업을 하지 않아도 좋다.
+def splitText(text: str) -> list[str]:
+    prompt = f'''
+세 개의 역따옴표로 구분된 문단이 주워진다.
+문단을 문장 단위로 나눈다.
+그 결과를 JSON 형식으로 sentences 키를 가진 문자열 목록으로 생성하라.
 
-입력은 한국어 문장으로 주워진다.
+```{text}```
+'''
+    answer = query(prompt)
+    #print("Debug: ", answer)
+    json_object = parse_json(answer)
+    return json_object['sentences']
 
-출력은 다음과 같은 형식을 따른다.
-아래와 같은 JSON 형식의 sentence 문자열에 결과를 대입한다.
-{
-	"sentence": ""
-}
+def main(args: argparse.Namespace):
+    with open(args.input_file, 'r', encoding='utf-8') as f:
+        text = f.read()
 
-입력이 "%s" 일 때 JSON 파일을 출력하라.""" % sentence
-
-    text = query(message)
-    json_object = parse_json(text)
-    return json_object['sentence']
-
-def easySentence(sentence: str) -> list[str]:
-    sentences = splitSentence(sentence)
-    
-    ret = []
-    for i in sentences:
-        ret.append(easyWord(i))
-    
-    return ret
-
-def main():
-    text = input()
-    result = easySentence(text)
-
-    for i in result:
-        print(i)
+        sentences = splitText(text)
+        for sentence in sentences:
+            for easy_sentence in translateToEasySentence(sentence):
+                print(easy_sentence)
+            print('-'*50)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input-file', dest='input_file', required=True, help='입력 파일')
+
+    args = parser.parse_args()
+
+    main(args)
