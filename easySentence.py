@@ -26,7 +26,7 @@ class EasySentenceTranslator:
 
         return response['choices'][0]['message']['content']
 
-    def parse_json(self, text: str) -> bool:
+    def parse_json(self, text: str):
         markdown = text.find('```')
         start_idx = 0
         if markdown != -1:
