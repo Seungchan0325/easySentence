@@ -1,4 +1,4 @@
-import src.easySentence as easySentence
+import easySentence as easySentence
 import streamlit as st
 
 st.title("Easy Sentence Translator With AI")
