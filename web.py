@@ -3,7 +3,7 @@ import streamlit as st
 
 st.title("Easy Sentence Translator With AI")
 
-api_key: str = st.secrets.OPEN_API_KEY
+api_key: str = st.secrets.OPENAI_API_KEY
 
 translator = easySentence.EasySentenceTranslator(api_key)
 
