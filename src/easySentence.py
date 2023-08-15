@@ -6,19 +6,25 @@ import json
 class EasySentenceTranslator:
     def __init__(self, api_key: str) -> None:
         openai.api_key = api_key
+        
+        dir_path = __file__
+        last_separator = dir_path.rfind('\\')
+        if last_separator == -1:
+            last_separator = dir_path.rfind('/')
+        dir_path = dir_path[0:last_separator]
+        
+        with open(dir_path + '/simplify_sentence_prompt.txt', 'r', encoding='utf-8') as f:
+            self._simplify_sentence_prompt = f.read()
 
-        with open('./simplify_sentence_prompt.txt', 'r', encoding='utf-8') as f:
-            self.simplify_sentence_prompt = f.read()
+        self._kkma = Kkma()
 
-        self.kkma = Kkma()
-
-    def query(self, prompt: str) -> str:
+    def _query(self, prompt: str) -> str:
         messages = [{'role': 'user', 'content': prompt}]
 
         response = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=messages,
-            temperature=1
+            temperature=0.5
         )
 
         if response['choices'][0]['finish_reason'] != 'stop':
@@ -26,7 +32,7 @@ class EasySentenceTranslator:
 
         return response['choices'][0]['message']['content']
 
-    def parse_json(self, text: str):
+    def _parse_json(self, text: str):
         markdown = text.find('```')
         start_idx = 0
         if markdown != -1:
@@ -43,16 +49,16 @@ class EasySentenceTranslator:
         return ret
 
     def simplifySentence(self, sentence: str) -> list[str]:
-        prompt = self.simplify_sentence_prompt + f'\n\n ```{sentence}```'
+        prompt = self._simplify_sentence_prompt + sentence
 
         while True:
-            answer = self.query(prompt)
-            json_object = self.parse_json(answer)
+            answer = self._query(prompt)
+            json_object = self._parse_json(answer)
 
             if json_object == -1:
-                # print('again')
-                # print('prompt: ', prompt)
-                # print('answer: ', answer)
+                print('again')
+                print('prompt: ', prompt)
+                print('answer: ', answer)
                 continue
             else:
                 break
@@ -60,7 +66,7 @@ class EasySentenceTranslator:
         return json_object['sentences']
 
     def translate(self, text: str) -> list[list[str]]:
-        sentences = self.kkma.sentences(text)
+        sentences = self._kkma.sentences(text)
 
         ret = []
         for sentence in sentences:

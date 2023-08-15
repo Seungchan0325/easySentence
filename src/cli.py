@@ -1,5 +1,5 @@
 import argparse
-import easySentence
+import src.easySentence as easySentence
 
 def main(args: argparse.Namespace):
     with open(args.input_file, 'r', encoding='utf-8') as f:
