@@ -3,7 +3,9 @@ import streamlit as st
 
 st.title("Easy Sentence Translator With AI")
 
-translator = easySentence.EasySentenceTranslator("OPENAI API KEY")
+api_key: str = st.secrets.OPEN_API_KEY
+
+translator = easySentence.EasySentenceTranslator(api_key)
 
 with st.form("form"):
     user_input = st.text_area("글을 입력해주세요 !")
