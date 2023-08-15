@@ -5,7 +5,7 @@ def main(args: argparse.Namespace):
     with open(args.input_file, 'r', encoding='utf-8') as f:
         text = f.read()
 
-    translator = easySentence.EasySentenceTranslator("API KEY")
+    translator = easySentence.EasySentenceTranslator("OPENAI API KEY")
     
     result = translator.translate(text)
     for i in result:
