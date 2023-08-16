@@ -8,9 +8,9 @@ class EasySentenceTranslator:
         openai.api_key = api_key
         
         dir_path = __file__
-        last_separator = dir_path.rfind('\\')
+        last_separator = dir_path.rfind('\\')       # windows 의 경우
         if last_separator == -1:
-            last_separator = dir_path.rfind('/')
+            last_separator = dir_path.rfind('/')    # linux 의 경우
         dir_path = dir_path[0:last_separator]
         
         with open(dir_path + '/simplify_sentence_prompt.txt', 'r', encoding='utf-8') as f:
@@ -32,7 +32,10 @@ class EasySentenceTranslator:
 
         return response['choices'][0]['message']['content']
 
+    # text 에서 json 형식이 포함되어 있으면 json 객체를 반환
+    # json 형식이 없다면 -1를 반환
     def _parse_json(self, text: str):
+        # text 에서 ```{json} ... ``` 와 같은 마크다운이 포한되어 있을 경우 예외처리
         markdown = text.find('```')
         start_idx = 0
         if markdown != -1:
@@ -56,9 +59,9 @@ class EasySentenceTranslator:
             json_object = self._parse_json(answer)
 
             if json_object == -1:
-                print('again')
-                print('prompt: ', prompt)
-                print('answer: ', answer)
+                # print('again')
+                # print('prompt: ', prompt)
+                # print('answer: ', answer)
                 continue
             else:
                 break

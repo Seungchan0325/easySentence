@@ -15,7 +15,7 @@ if submit and user_input:
     with st.spinner("문장 변환중입니다. 잠시만 기다려주세요..."):
         result = translator.translate(user_input)
 
-    # markdown 표
+    # '-------------' markdown 표
     st.write('-' * 50)
     for i in result:
         for j in i:
