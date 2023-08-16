@@ -3,6 +3,11 @@ import streamlit as st
 
 st.title("Easy Sentence Translator With AI")
 
+# ./streamlit/secrets.toml 파일을 추가 해야함
+#
+# secrets.toml
+#
+# OPENAI_API_KEY = "YOUR OPENAI API KEY"
 api_key: str = st.secrets.OPENAI_API_KEY
 
 translator = easySentence.EasySentenceTranslator(api_key)
